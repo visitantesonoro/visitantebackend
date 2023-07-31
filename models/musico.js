@@ -5,11 +5,14 @@ const musicoSchema = mongoose.Schema({
     type: String, 
     required: true 
   },
-  imagen:{
+  descripcion:{
     type:String,
     required:false
   },
-  grabaciones: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Grabaciones'}]
+  imagen:{
+    type:String,
+    required:false
+  }
 });
 
 module.exports = mongoose.model('Musicos', musicoSchema);

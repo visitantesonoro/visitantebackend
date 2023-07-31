@@ -7,6 +7,8 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const musicosRouter = require('./routes/musicos');
 const grabacionesRouter = require('./routes/grabaciones');
+const categoriasRouter = require("./routes/categorias");
+const tagsRouter = require("./routes/tags");
 
 const app = express();
 app.use(bodyParser.json());
@@ -23,13 +25,15 @@ app.use((req, res, next) => {
 
 app.use("/admin/musicos/", musicosRouter);
 app.use("/admin/grabaciones/", grabacionesRouter);
+app.use("/admin/categorias/", categoriasRouter);
+app.use("/admin/tags/", tagsRouter);
 
 mongoose.connect(process.env.DATABASE_URL);
 
 const db = mongoose.connection;
 db.on("error", (error) => console.error(error));
 db.once("open", () => {
-  console.log("Conectado");
+  console.log("conecto");
 });
 
 app.listen(process.env.PORT || 4200);

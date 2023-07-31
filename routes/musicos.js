@@ -8,13 +8,11 @@ router.get("/", musicosController.traerMusicos)
 
 router.post("/crear", [
   check('nombre').not().isEmpty(),
-  check('imagen').not().isEmpty(),
 ], 
 musicosController.crearMusico);
 
 router.patch("/editar/:id", [
   check('nombre').not().isEmpty(),
-  check('imagen').not().isEmpty(),
 ], 
 musicosController.editarMusico);
 

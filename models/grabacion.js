@@ -34,6 +34,16 @@ const grabacionSchema = mongoose.Schema({
     required:true,
     ref: 'Musicos'
   },
+  categoria: {
+    type: mongoose.Schema.Types.ObjectId,
+    required:false,
+    ref: 'Categorias'
+  },
+  tags: {
+    type: [mongoose.Schema.Types.ObjectId],
+    required:false,
+    ref: 'Tags'
+  },
 });
 
 module.exports = mongoose.model("Grabaciones", grabacionSchema);

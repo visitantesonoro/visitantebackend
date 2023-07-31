@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
-const Musico = require("../models/musicos");
+const Musico = require("../models/musico");
+const Grabacion = require("../models/grabacion");
 
 async function traerMusicos(req, res, next) {
   const musicos = await Musico.find();
@@ -13,12 +14,12 @@ async function crearMusico(req, res, next) {
     res.json("Algun campo no está bien");
     return;
   }
-
-  const { nombre, imagen } = req.body;
+  const { nombre, imagen, descripcion } = req.body;
 
   const musico = new Musico({
     nombre,
     imagen,
+    descripcion
   });
 
   try {
@@ -55,10 +56,11 @@ async function editarMusico(req, res, next) {
     return;
   }
 
-  const { nombre, imagen } = req.body;
+  const { nombre, imagen, descripcion } = req.body;
 
   musicoDB.nombre = nombre;
   musicoDB.imagen = imagen;
+  musicoDB.descripcion = descripcion;
 
   try {
     await musicoDB.save();
@@ -69,19 +71,30 @@ async function editarMusico(req, res, next) {
   res.json(musicoDB);
 }
 
-async function borrarMusico(req, res, next){
-    const id = req.params.id;
+async function borrarMusico(req, res, next) {
+  const id = req.params.id;
 
-    console.log(id);
+  let grabaciones;
 
-    try{
-       await  Musico.findByIdAndDelete(id);
+  try {
+    grabaciones = await Grabacion.find({ musico: id });
+  } catch (error) {
+    console.log(error);
+  }
 
-    }catch(error){
-        res.json("algo ocurrió al tratar de borrar")
-    }
+  if (grabaciones.length > 0) {
+    res.json(false);
 
-    res.json("se borró el músico");
+    return;
+  }
+
+  try {
+    await Musico.findByIdAndDelete(id);
+  } catch (error) {
+    res.json("algo ocurrió al tratar de borrar");
+  }
+
+  res.json("se borró el músico");
 }
 
 exports.traerMusicos = traerMusicos;

@@ -1,38 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const grabacionController = require("../controllers/grabaciones");
 
-const Grabacion = require("../models/grabacion");
+router.get("/", grabacionController.traerGrabaciones);
+router.get("/:id", grabacionController.traerGrabacion);
 
-const Musico = require("../models/musicos");
-
-router.get("/", (req, res) => {
-  res.json("Acá irían todas las grabaciones");
-});
-
-router.post("/crear", async (req, res) => {
-  const {
-    titulo,
-    descripcion,
-    fecha,
-    fechaPublicacion,
-    lugar,
-    longitud,
-    latitud,
-    musico,
-  } = req.body;
-
-  const grabacion = new Grabacion({
-    titulo,
-    descripcion,
-    fecha: new Date(fecha),
-    fechaPublicacion,
-    lugar,
-    longitud,
-    latitud,
-    musico,
-  })
-
-});
+router.post("/crear", grabacionController.crearGrabacion);
+router.patch("/editar/:id", grabacionController.editarGrabacion);
+router.delete("/borrar/:id", grabacionController.borrarGrabacion);
 
 module.exports = router;
