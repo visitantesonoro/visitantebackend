@@ -57,7 +57,8 @@ async function crearGrabacion(req, res, next) {
     latitud,
     musico,
     categoria,
-    tags
+    tags,
+    audio
   } = req.body;
 
   const grabacion = new Grabacion({
@@ -70,7 +71,8 @@ async function crearGrabacion(req, res, next) {
     latitud,
     musico,
     categoria,
-    tags
+    tags,
+    audio
   });
 
   let musicoDB;
@@ -102,6 +104,8 @@ async function editarGrabacion(req, res, next) {
     return;
   }
 
+  console.log(req.params);
+
   const id = req.params.id
 
   const {
@@ -113,10 +117,9 @@ async function editarGrabacion(req, res, next) {
     latitud,
     musico,
     categoria,
-    tags
+    tags,
+    audio
   } = req.body;
-
-  console.log(tags);
 
   const grabacion = await Grabacion.findById(id);
   grabacion.titulo = titulo;
@@ -128,6 +131,7 @@ async function editarGrabacion(req, res, next) {
   grabacion.musico = musico;
   grabacion.categoria = categoria;
   grabacion.tags = tags;
+  grabacion.audio = audio;
 
   let musicoDB;
   try {
@@ -147,6 +151,8 @@ async function editarGrabacion(req, res, next) {
   } catch {
     res.json("falló la creación de la grabación");
   }
+
+  console.log(grabacion);
 
   res.json(grabacion);
 } 

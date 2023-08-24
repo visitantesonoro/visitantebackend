@@ -44,6 +44,10 @@ const grabacionSchema = mongoose.Schema({
     required:false,
     ref: 'Tags'
   },
+  // audio:{
+  //   type:String,
+  //   required:true
+  // }
 });
 
 module.exports = mongoose.model("Grabaciones", grabacionSchema);

@@ -17,7 +17,10 @@
     "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.4.0",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "multer-ftp": "^1.2.0",
+    "multer-sftp": "^1.1.1",
+    "ssh2-sftp-client": "^9.1.0"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",

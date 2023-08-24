@@ -9,9 +9,12 @@ const musicosRouter = require('./routes/musicos');
 const grabacionesRouter = require('./routes/grabaciones');
 const categoriasRouter = require("./routes/categorias");
 const tagsRouter = require("./routes/tags");
+const adminRouter = require("./routes/admin");
+const path = require('path');
 
 const app = express();
 app.use(bodyParser.json());
+
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -23,10 +26,15 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/admin/categorias/", categoriasRouter);
+
 app.use("/admin/musicos/", musicosRouter);
 app.use("/admin/grabaciones/", grabacionesRouter);
-app.use("/admin/categorias/", categoriasRouter);
+
 app.use("/admin/tags/", tagsRouter);
+app.use("/admin/administradores/", adminRouter);
+
+app.use("/public", express.static(path.join(__dirname, './public/')));
 
 mongoose.connect(process.env.DATABASE_URL);
 

@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { validationResult } = require("express-validator");
 const Categoria = require("../models/categoria");
 
@@ -55,10 +56,14 @@ async function editarCategoria(req, res, next) {
     return;
   }
 
-  const { titulo, imagen, descripcion } = req.body;
+  const imgA = categoriaDB.imagen;
+
+  console.log(imgA);
+
+  const { titulo, descripcion } = req.body;
 
   categoriaDB.titulo = titulo;
-  categoriaDB.imagen = imagen;
+  categoriaDB.imagen = req.file.path;;
   categoriaDB.descripcion = descripcion;
 
   try {
@@ -66,6 +71,10 @@ async function editarCategoria(req, res, next) {
   } catch {
     res.json("falló la creación");
   }
+
+  fs.unlink(imgA, (err) => {
+    console.log(err);
+  });
 
   res.json(categoriaDB);
 }

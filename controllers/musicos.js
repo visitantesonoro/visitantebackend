@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { validationResult } = require("express-validator");
 const Musico = require("../models/musico");
 const Grabacion = require("../models/grabacion");
@@ -56,17 +57,25 @@ async function editarMusico(req, res, next) {
     return;
   }
 
-  const { nombre, imagen, descripcion } = req.body;
+  const imgA = musicoDB.imagen;
+
+  const { nombre, descripcion } = req.body;
 
   musicoDB.nombre = nombre;
-  musicoDB.imagen = imagen;
+  musicoDB.imagen = req.file.path;
   musicoDB.descripcion = descripcion;
+
+  console.log(musicoDB.imagen);
 
   try {
     await musicoDB.save();
   } catch {
     res.json("falló la creación");
   }
+
+  fs.unlink(imgA, (err) => {
+    console.log(err);
+  });
 
   res.json(musicoDB);
 }
