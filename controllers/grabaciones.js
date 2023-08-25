@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const fs = require("fs");
 const { validationResult } = require("express-validator");
 const Grabacion = require("../models/grabacion");
 const Musico = require("../models/musico");
@@ -15,18 +16,17 @@ async function traerGrabaciones(req, res, next) {
     musicos,
     grabaciones,
     categorias,
-    tags
-  }
+    tags,
+  };
 
   res.json(info);
 }
 
 async function traerGrabacion(req, res, next) {
-
   const id = req.params.id;
 
   const grabacion = await Grabacion.findById(id);
-  const musicos = await Musico.find({})
+  const musicos = await Musico.find({});
   const categorias = await Categoria.find({});
   const tags = await Tag.find({});
 
@@ -34,8 +34,8 @@ async function traerGrabacion(req, res, next) {
     musicos,
     grabacion,
     categorias,
-    tags
-  }
+    tags,
+  };
 
   res.json(info);
 }
@@ -58,7 +58,7 @@ async function crearGrabacion(req, res, next) {
     musico,
     categoria,
     tags,
-    audio
+    audio,
   } = req.body;
 
   const grabacion = new Grabacion({
@@ -72,7 +72,7 @@ async function crearGrabacion(req, res, next) {
     musico,
     categoria,
     tags,
-    audio
+    audio,
   });
 
   let musicoDB;
@@ -104,9 +104,7 @@ async function editarGrabacion(req, res, next) {
     return;
   }
 
-  console.log(req.params);
-
-  const id = req.params.id
+  const id = req.params.id;
 
   const {
     titulo,
@@ -118,55 +116,63 @@ async function editarGrabacion(req, res, next) {
     musico,
     categoria,
     tags,
-    audio
   } = req.body;
 
-  const grabacion = await Grabacion.findById(id);
+  let tagsDB = JSON.parse(tags);
+  let fechaDB = JSON.parse(fecha);
+
+  let grabacion;
+
+  try {
+    grabacion = await Grabacion.findById(id);
+
+    if (!grabacion) {
+      res.json("no encontramos la grabación");
+      return;
+    }
+  } catch (e) {
+    res.json("Algo ocurrió al momento de acceder a la base de datos");
+    return;
+  }
+
+  const audioA = grabacion.audio;
+
   grabacion.titulo = titulo;
   grabacion.descripcion = descripcion;
-  grabacion.fecha = fecha;
+  grabacion.fecha = fechaDB;
   grabacion.lugar = lugar;
   grabacion.longitud = longitud;
   grabacion.latitud = latitud;
   grabacion.musico = musico;
   grabacion.categoria = categoria;
-  grabacion.tags = tags;
-  grabacion.audio = audio;
-
-  let musicoDB;
-  try {
-    musicoDB = await Musico.findById(musico);
-  } catch (err) {
-    res.json("algo sucedio al tratar de traer el músico");
-    return;
-  }
-
-  if (!musicoDB) {
-    res.json("No se encontró el músico");
-    return;
-  }
+  grabacion.tags = tagsDB;
+  grabacion.audio = req.file.path;
 
   try {
     await grabacion.save();
   } catch {
     res.json("falló la creación de la grabación");
+    return;
   }
 
-  console.log(grabacion);
+  fs.unlink(audioA, (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
 
   res.json(grabacion);
-} 
+}
 
-async function borrarGrabacion(req, res, next){
+async function borrarGrabacion(req, res, next) {
   const id = req.params.id;
 
   console.log(id);
 
-  try{
-     await  Grabacion.findByIdAndDelete(id);
-
-  }catch(error){
-      res.json("algo ocurrió al tratar de borrar")
+  try {
+    await Grabacion.findByIdAndDelete(id);
+  } catch (error) {
+    res.json("algo ocurrió al tratar de borrar");
   }
 
   res.json("se borró la grabación");

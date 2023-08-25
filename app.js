@@ -26,11 +26,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/admin/categorias/", categoriasRouter);
-
 app.use("/admin/musicos/", musicosRouter);
 app.use("/admin/grabaciones/", grabacionesRouter);
-
+app.use("/admin/categorias/", categoriasRouter);
 app.use("/admin/tags/", tagsRouter);
 app.use("/admin/administradores/", adminRouter);
 

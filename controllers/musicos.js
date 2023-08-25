@@ -15,12 +15,12 @@ async function crearMusico(req, res, next) {
     res.json("Algun campo no está bien");
     return;
   }
-  const { nombre, imagen, descripcion } = req.body;
+  const { nombre, descripcion } = req.body;
 
   const musico = new Musico({
     nombre,
-    imagen,
-    descripcion
+    imagen:req.file.path,
+    descripcion,
   });
 
   try {
@@ -39,21 +39,17 @@ async function editarMusico(req, res, next) {
     return;
   }
 
-  const id = req.params.id;
-
   let musicoDB;
 
   try {
-    musicoDB = await Musico.findById(id);
+    musicoDB = await Musico.findById(req.params.id);
 
     if (!musicoDB) {
       res.json("no encontramos el músico");
-
       return;
     }
-  } catch (erros) {
+  } catch (error) {
     res.json("Algo ocurrió al momento de acceder a la base de datos");
-
     return;
   }
 
@@ -62,20 +58,23 @@ async function editarMusico(req, res, next) {
   const { nombre, descripcion } = req.body;
 
   musicoDB.nombre = nombre;
-  musicoDB.imagen = req.file.path;
+  musicoDB.imagen = req.file ? req.file.path : musicoDB.imagen;
   musicoDB.descripcion = descripcion;
-
-  console.log(musicoDB.imagen);
 
   try {
     await musicoDB.save();
   } catch {
     res.json("falló la creación");
+    return;
   }
 
-  fs.unlink(imgA, (err) => {
-    console.log(err);
-  });
+  if (req.file) {
+    fs.unlink(imgA, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
 
   res.json(musicoDB);
 }
@@ -93,9 +92,28 @@ async function borrarMusico(req, res, next) {
 
   if (grabaciones.length > 0) {
     res.json(false);
-
     return;
   }
+
+  let musicoDB;
+
+  try {
+    musicoDB = await Musico.findById(req.params.id);
+
+    if (!musicoDB) {
+      res.json("no encontramos el músico");
+      return;
+    }
+  } catch (error) {
+    res.json("Algo ocurrió al momento de acceder a la base de datos");
+    return;
+  }
+
+  fs.unlink(musicoDB.imagen, (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
 
   try {
     await Musico.findByIdAndDelete(id);
