@@ -5,10 +5,10 @@ const grabacionController = require("../controllers/grabaciones");
 const { check } = require("express-validator");
 const multer = require("multer");
 const crypto = require("crypto");
-const path = require("path");
 
 const MIME_TYPE_MAP = {
   "audio/mpeg": "mp3",
+  "audio/x-m4a": "m4a",
 };
 
 const fileUpload = multer({
@@ -31,17 +31,42 @@ const fileUpload = multer({
   }),
   fileFilter: (req, file, cb) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
-
     let error = isValid ? null : "invalido";
-
     cb(error, isValid);
   },
 });
 
 router.get("/", grabacionController.traerGrabaciones);
 router.get("/:id", grabacionController.traerGrabacion);
-router.post("/crear", grabacionController.crearGrabacion);
-router.patch("/editar/:id", fileUpload.single("audio"), grabacionController.editarGrabacion);
+
+router.post(
+  "/crear",
+  fileUpload.single("audio"),
+  [
+    check("titulo").not().isEmpty(),
+    check("fecha").not().isEmpty(),
+    check("lugar").not().isEmpty(),
+    check("longitud").not().isEmpty(),
+    check("latitud").not().isEmpty(),
+    check("musico").not().isEmpty(),
+  ],
+  grabacionController.crearGrabacion
+);
+
+router.patch(
+  "/editar/:id",
+  fileUpload.single("audio"),
+  [
+    check("titulo").not().isEmpty(),
+    check("fecha").not().isEmpty(),
+    check("lugar").not().isEmpty(),
+    check("longitud").not().isEmpty(),
+    check("latitud").not().isEmpty(),
+    check("musico").not().isEmpty(),
+  ],
+  grabacionController.editarGrabacion
+);
+
 router.delete("/borrar/:id", grabacionController.borrarGrabacion);
 
 module.exports = router;

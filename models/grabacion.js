@@ -14,7 +14,7 @@ const grabacionSchema = mongoose.Schema({
   },
   fecha: {
     type: Date,
-    required: true,
+    required: false,
   },
   fechaPublicacion: {
     type: Date,

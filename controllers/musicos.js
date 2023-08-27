@@ -80,12 +80,11 @@ async function editarMusico(req, res, next) {
 }
 
 async function borrarMusico(req, res, next) {
-  const id = req.params.id;
 
   let grabaciones;
 
   try {
-    grabaciones = await Grabacion.find({ musico: id });
+    grabaciones = await Grabacion.find({ musico: req.params.id });
   } catch (error) {
     console.log(error);
   }
@@ -116,7 +115,7 @@ async function borrarMusico(req, res, next) {
   });
 
   try {
-    await Musico.findByIdAndDelete(id);
+    await Musico.findByIdAndDelete(req.params.id);
   } catch (error) {
     res.json("algo ocurrió al tratar de borrar");
   }

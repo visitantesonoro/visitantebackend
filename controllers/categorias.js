@@ -4,7 +4,6 @@ const Categoria = require("../models/categoria");
 
 async function traerCategorias(req, res, next) {
   const categorias = await Categoria.find();
-
   res.json(categorias);
 }
 
@@ -14,12 +13,12 @@ async function crearCategoria(req, res, next) {
     res.json("Algun campo no está bien");
     return;
   }
-  const { titulo, imagen, descripcion } = req.body;
+  const { titulo, descripcion } = req.body;
 
   const categoria = new Categoria({
     titulo,
-    imagen,
-    descripcion
+    imagen: req.file ? req.file.path : "",
+    descripcion,
   });
 
   try {
@@ -58,12 +57,10 @@ async function editarCategoria(req, res, next) {
 
   const imgA = categoriaDB.imagen;
 
-  console.log(imgA);
-
   const { titulo, descripcion } = req.body;
 
   categoriaDB.titulo = titulo;
-  categoriaDB.imagen = req.file.path;;
+  categoriaDB.imagen = req.file ? req.file.path : categoriaDB.imagen;
   categoriaDB.descripcion = descripcion;
 
   try {
@@ -72,15 +69,39 @@ async function editarCategoria(req, res, next) {
     res.json("falló la creación");
   }
 
-  fs.unlink(imgA, (err) => {
-    console.log(err);
-  });
+  if (req.file) {
+    fs.unlink(imgA, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
 
   res.json(categoriaDB);
 }
 
 async function borrarCategoria(req, res, next) {
   const id = req.params.id;
+
+  let categoria;
+
+  try {
+    categoria = await Categoria.findById(id);
+
+    if (!categoria) {
+      res.json("La categoría ya no existe en nuestra base de datos");
+    }
+  } catch (error) {
+    res.json("algo ocurrió al tratar de borrar");
+  }
+
+  let img = categoria.imagen;
+
+  fs.unlink(img, (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
 
   try {
     await Categoria.findByIdAndDelete(id);

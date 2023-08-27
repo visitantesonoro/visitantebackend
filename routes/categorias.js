@@ -5,7 +5,7 @@ const categoriasController = require("../controllers/categorias");
 const { check } = require("express-validator");
 const multer = require("multer");
 const crypto = require("crypto");
-const path = require("path");
+
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -17,8 +17,6 @@ const fileUpload = multer({
   limits: 500000,
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const archivosPath = path.join(__dirname, "../public/uploads/musicos");
-
       cb(null, "./public/uploads/categorias");
     },
     filename: (req, file, cb) => {
@@ -35,9 +33,7 @@ const fileUpload = multer({
   }),
   fileFilter: (req, file, cb) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
-
     let error = isValid ? null : "invalido";
-
     cb(error, isValid);
   },
 });
@@ -46,6 +42,7 @@ router.get("/", categoriasController.traerCategorias);
 
 router.post(
   "/crear",
+  fileUpload.single("imagen"),
   [check("titulo").not().isEmpty()],
   categoriasController.crearCategoria
 );

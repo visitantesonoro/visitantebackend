@@ -6,7 +6,6 @@ const { check } = require("express-validator");
 const multer = require("multer");
 const crypto = require("crypto");
 
-
 const MIME_TYPE_MAP = {
   "image/png": "png",
   "image/jpeg": "jpeg",

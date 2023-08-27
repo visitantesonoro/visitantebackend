@@ -58,40 +58,30 @@ async function crearGrabacion(req, res, next) {
     musico,
     categoria,
     tags,
-    audio,
   } = req.body;
 
-  const grabacion = new Grabacion({
+  let tagsDB = JSON.parse(tags);
+  let fechaDB = JSON.parse(fecha);
+
+  const grabacion = await new Grabacion({
     titulo,
     descripcion,
-    fecha: new Date(fecha),
+    fecha: fechaDB,
     fechaPublicacion,
     lugar,
     longitud,
     latitud,
     musico,
     categoria,
-    tags,
-    audio,
+    tags:tagsDB,
+    audio:req.file.path
   });
-
-  let musicoDB;
-  try {
-    musicoDB = await Musico.findById(musico);
-  } catch (err) {
-    res.json("algo sucedio al tratar de traer el músico");
-    return;
-  }
-
-  if (!musicoDB) {
-    res.json("No se encontró el músico");
-    return;
-  }
 
   try {
     await grabacion.save();
   } catch {
     res.json("falló la creación de la grabación");
+    return;
   }
 
   res.json(grabacion);
@@ -146,7 +136,7 @@ async function editarGrabacion(req, res, next) {
   grabacion.musico = musico;
   grabacion.categoria = categoria;
   grabacion.tags = tagsDB;
-  grabacion.audio = req.file.path;
+  grabacion.audio = req.file ? req.file.path : grabacion.audio;
 
   try {
     await grabacion.save();
@@ -155,11 +145,13 @@ async function editarGrabacion(req, res, next) {
     return;
   }
 
-  fs.unlink(audioA, (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+  if (req.file) {
+    fs.unlink(audioA, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
 
   res.json(grabacion);
 }
@@ -167,7 +159,27 @@ async function editarGrabacion(req, res, next) {
 async function borrarGrabacion(req, res, next) {
   const id = req.params.id;
 
-  console.log(id);
+  let grabacion;
+
+  try{
+    grabacion = await Grabacion.findById(id);
+
+    if(!grabacion){
+      res.json("La grabación ya no existe en la base de datos");
+    }
+
+  }catch(error){
+    console.log(error);
+    res.json("Algo ocurrió al tratar de borrar")
+  }
+
+  const audio = grabacion.audio;  
+
+  fs.unlink(audio, (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
 
   try {
     await Grabacion.findByIdAndDelete(id);
