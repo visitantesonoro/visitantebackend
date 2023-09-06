@@ -5,6 +5,10 @@ const musicoSchema = mongoose.Schema({
     type: String, 
     required: true 
   },
+  url:{
+    type:String,
+    required:false
+  },
   descripcion:{
     type:String,
     required:false
