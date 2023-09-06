@@ -5,7 +5,7 @@ const musicoSchema = mongoose.Schema({
     type: String, 
     required: true 
   },
-  urlmusico:{
+  url:{
     type:String,
     required:false
   },
