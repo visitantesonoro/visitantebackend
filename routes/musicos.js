@@ -5,6 +5,10 @@ const musicosController = require("../controllers/musicos");
 const { check } = require("express-validator");
 const multer = require("multer");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
+const { checkAuth } = require("../middleware/check-auth");
+
+router.get("/", musicosController.traerMusicos);
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -12,11 +16,11 @@ const MIME_TYPE_MAP = {
   "image/jpg": "jpg",
 };
 
-const fileUpload = multer({ 
+const fileUpload = multer({
   limits: 500000,
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, './public/uploads/musicos');
+      cb(null, "./public/uploads/musicos");
     },
     filename: (req, file, cb) => {
       const ext = MIME_TYPE_MAP[file.mimetype];
@@ -27,14 +31,14 @@ const fileUpload = multer({
       cb(null, name);
     },
   }),
-  fileFilter: (req, file, cb) => {    
+  fileFilter: (req, file, cb) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
     let error = isValid ? null : "invalido";
     cb(error, isValid);
   },
 });
 
-router.get("/", musicosController.traerMusicos);
+router.use(checkAuth);
 
 router.post(
   "/crear",

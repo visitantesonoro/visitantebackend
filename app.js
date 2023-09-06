@@ -15,7 +15,6 @@ const path = require('path');
 const app = express();
 app.use(bodyParser.json());
 
-
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(

@@ -48,16 +48,23 @@ const login = async(req, res)=>{
     return;
   }
 
-  const passwordBueno = await bcrypt.compare(password, usuarioDB.password);
+  const passwordBueno = bcrypt.compare(password, usuarioDB.password);
 
   if (!passwordBueno) {
     res.json("El password está mal");
     return;
   }
 
-  const token = jwt.sign({ userId: usuarioDB._id }, "clave_secreta", {
-    expiresIn: "1h",
-  });
+  let token;
+
+  try{
+    token = jwt.sign({ userId: usuarioDB._id }, "clave_secreta", {
+      expiresIn: "1h",
+    });
+  }catch(error){
+    console.log(error);
+    return;
+  }
 
   const adminData = {
     id: usuarioDB._id,

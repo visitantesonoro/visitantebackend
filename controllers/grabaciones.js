@@ -25,7 +25,15 @@ async function traerGrabaciones(req, res, next) {
 async function traerGrabacion(req, res, next) {
   const id = req.params.id;
 
-  const grabacion = await Grabacion.findById(id);
+  let grabacion;
+
+  try{
+    grabacion = await Grabacion.findById(id);
+  }catch(error){
+    res.json(false)
+    return;
+  }
+
   const musicos = await Musico.find({});
   const categorias = await Categoria.find({});
   const tags = await Tag.find({});
@@ -50,6 +58,7 @@ async function crearGrabacion(req, res, next) {
   const {
     titulo,
     descripcion,
+    interpretes,
     fecha,
     fechaPublicacion,
     lugar,
@@ -66,6 +75,7 @@ async function crearGrabacion(req, res, next) {
   const grabacion = await new Grabacion({
     titulo,
     descripcion,
+    interpretes,
     fecha: fechaDB,
     fechaPublicacion,
     lugar,
@@ -99,6 +109,7 @@ async function editarGrabacion(req, res, next) {
   const {
     titulo,
     descripcion,
+    interpretes,
     fecha,
     lugar,
     longitud,
@@ -129,6 +140,7 @@ async function editarGrabacion(req, res, next) {
 
   grabacion.titulo = titulo;
   grabacion.descripcion = descripcion;
+  grabacion.interpretes = interpretes;
   grabacion.fecha = fechaDB;
   grabacion.lugar = lugar;
   grabacion.longitud = longitud;

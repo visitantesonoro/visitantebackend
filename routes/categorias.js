@@ -5,7 +5,11 @@ const categoriasController = require("../controllers/categorias");
 const { check } = require("express-validator");
 const multer = require("multer");
 const crypto = require("crypto");
+const { checkAuth } = require("../middleware/check-auth");
 
+router.get("/", categoriasController.traerCategorias);
+
+router.use(checkAuth);
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -37,8 +41,6 @@ const fileUpload = multer({
     cb(error, isValid);
   },
 });
-
-router.get("/", categoriasController.traerCategorias);
 
 router.post(
   "/crear",

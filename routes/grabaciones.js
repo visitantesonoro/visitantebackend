@@ -5,6 +5,12 @@ const grabacionController = require("../controllers/grabaciones");
 const { check } = require("express-validator");
 const multer = require("multer");
 const crypto = require("crypto");
+const { checkAuth } = require("../middleware/check-auth");
+
+router.get("/", grabacionController.traerGrabaciones);
+router.get("/:id", grabacionController.traerGrabacion);
+
+router.use(checkAuth);
 
 const MIME_TYPE_MAP = {
   "audio/mpeg": "mp3",
@@ -35,9 +41,6 @@ const fileUpload = multer({
     cb(error, isValid);
   },
 });
-
-router.get("/", grabacionController.traerGrabaciones);
-router.get("/:id", grabacionController.traerGrabacion);
 
 router.post(
   "/crear",

@@ -5,6 +5,11 @@ const tagController = require("../controllers/tags");
 const { check } = require("express-validator");
 const multer = require("multer");
 const crypto = require("crypto");
+const { checkAuth } = require("../middleware/check-auth");
+
+router.get("/", tagController.traerTags);
+
+router.use(checkAuth);
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -36,8 +41,6 @@ const fileUpload = multer({
     cb(error, isValid);
   },
 });
-
-router.get("/", tagController.traerTags);
 
 router.post(
   "/crear",

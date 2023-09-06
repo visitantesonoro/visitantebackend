@@ -19,7 +19,7 @@ async function crearMusico(req, res, next) {
 
   const musico = new Musico({
     nombre,
-    imagen:req.file.path,
+    imagen:(req.file) ? req.file.path : '',
     descripcion,
   });
 

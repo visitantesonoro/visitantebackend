@@ -11,6 +11,11 @@ const grabacionSchema = mongoose.Schema({
   },
   descripcion: {
     type: String,
+    required: false,
+  },
+  interpretes: {
+    type: String,
+    required: false,
   },
   fecha: {
     type: Date,
