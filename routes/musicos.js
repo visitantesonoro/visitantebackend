@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const { checkAuth } = require("../middleware/check-auth");
 
 router.get("/", musicosController.traerMusicos);
+router.get("/:id", musicosController.traerMusico);
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
