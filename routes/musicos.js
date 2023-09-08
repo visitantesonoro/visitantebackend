@@ -10,6 +10,7 @@ const { checkAuth } = require("../middleware/check-auth");
 
 router.get("/", musicosController.traerMusicos);
 router.get("/:id", musicosController.traerMusico);
+router.get("/url/:url", musicosController.traerMusicoUrl);
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
