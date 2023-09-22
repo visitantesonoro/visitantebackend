@@ -9,6 +9,8 @@ const { checkAuth } = require("../middleware/check-auth");
 
 router.get("/", grabacionController.traerGrabaciones);
 router.get("/:id", grabacionController.traerGrabacion);
+router.get("/url/:url", grabacionController.traerGrabacionUrl);
+router.get("/random/:id", grabacionController.traerGrabacionRandom);
 
 router.use(checkAuth);
 

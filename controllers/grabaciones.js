@@ -5,6 +5,7 @@ const Grabacion = require("../models/grabacion");
 const Musico = require("../models/musico");
 const Categoria = require("../models/categoria");
 const Tag = require("../models/tag");
+const { crearFriendlyUrl } = require("../middleware/friendly-url");
 
 async function traerGrabaciones(req, res, next) {
   const grabaciones = await Grabacion.find({});
@@ -27,10 +28,32 @@ async function traerGrabacion(req, res, next) {
 
   let grabacion;
 
-  try{
-    grabacion = await Grabacion.findById(id);
-  }catch(error){
-    res.json(false)
+  if (id == "0") {
+    try {
+      let n = await Grabacion.count();
+
+      let nR = Math.floor(Math.random() * n);
+
+      grabacion = await Grabacion.findOne().skip(nR);
+    } catch (error) {
+      res.json(false);
+      return;
+    }
+  } else {
+    try {
+      grabacion = await Grabacion.findById(id);
+    } catch (error) {
+      res.json(false);
+      return;
+    }
+  }
+
+  if (!grabacion) {
+    const respuesta = {
+      error: true,
+      mensaje: `La grabación no se ha encontrado`,
+    };
+    res.json(respuesta);
     return;
   }
 
@@ -43,6 +66,95 @@ async function traerGrabacion(req, res, next) {
     grabacion,
     categorias,
     tags,
+  };
+
+  res.json(info);
+}
+
+async function traerGrabacionUrl(req, res, next) {
+  const url = req.params.url;
+
+  let grabacionR;
+
+  try {
+    grabacionR = await Grabacion.find({ url: url });
+  } catch (error) {
+    const respuesta = {
+      error: true,
+      mensaje: `Ha ocurrido un error en la conexión`,
+    };
+    res.json(respuesta);
+    return;
+  }
+
+  if (!grabacionR) {
+    const respuesta = {
+      error: true,
+      mensaje: `La grabación no se ha encontrado`,
+    };
+    res.json(respuesta);
+    return;
+  }
+
+  const grabacion = grabacionR[0];
+
+  const musico = await Musico.findById(grabacion.musico);
+
+  const categoria = await Categoria.findById(grabacion.categoria);
+  //const tags = await Tag.findById({});
+
+  const grabacionesCategoria = await Grabacion.find({
+    categoria: categoria._id,
+  });
+  const grabacionesMusico = await Grabacion.find({ musico: musico.id });
+
+  const info = {
+    musico,
+    grabacion,
+    categoria,
+    grabacionesCategoria,
+    grabacionesMusico,
+    //tags,
+  };
+
+  res.json(info);
+}
+
+async function traerGrabacionRandom(req, res, next) {
+  const id = req.params.id;
+
+  console.log("llegó");
+
+  let grabacion;
+
+  try {
+    let n = await Grabacion.count();
+    let nR = Math.floor(Math.random() * n);
+    grabacion = await Grabacion.findOne().skip(nR);
+  } catch (error) {
+    res.json(false);
+    return;
+  }
+
+  if (!grabacion) {
+    const respuesta = {
+      error: true,
+      mensaje: `La grabación no se ha encontrado`,
+    };
+    res.json(respuesta);
+    return;
+  }
+
+  const musico = await Musico.findById(grabacion.musico);
+
+  const categoria = await Categoria.findById(grabacion.categoria);
+  //const tags = await Tag.findById({});
+
+  const info = {
+    musico,
+    grabacion,
+    categoria,
+    //tags,
   };
 
   res.json(info);
@@ -69,11 +181,42 @@ async function crearGrabacion(req, res, next) {
     tags,
   } = req.body;
 
+  const urlString = crearFriendlyUrl(titulo);
+
+  let existeUrl;
+
+  try {
+    existeUrl = await Grabacion.find({ url: urlString });
+  } catch (error) {
+    const respuesta = {
+      error: true,
+      mensaje: `Algo ocurrio en la base de datos: ${error.message}`,
+    };
+    res.json(respuesta);
+  }
+
+  if (existeUrl.length > 0) {
+    const respuesta = {
+      error: true,
+      mensaje: `ya existe una grabacion con ese nombre`,
+    };
+    res.json(respuesta);
+
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+
+    return;
+  }
+
   let tagsDB = JSON.parse(tags);
   let fechaDB = JSON.parse(fecha);
 
   const grabacion = await new Grabacion({
     titulo,
+    url: urlString,
     descripcion,
     interpretes,
     fecha: fechaDB,
@@ -83,8 +226,8 @@ async function crearGrabacion(req, res, next) {
     latitud,
     musico,
     categoria,
-    tags:tagsDB,
-    audio:req.file.path
+    tags: tagsDB,
+    audio: req.file.path,
   });
 
   try {
@@ -119,6 +262,32 @@ async function editarGrabacion(req, res, next) {
     tags,
   } = req.body;
 
+  const urlString = crearFriendlyUrl(titulo);
+
+  let grabacionConUrl;
+
+  try {
+    grabacionConUrl = await Grabacion.find({ url: urlString });
+  } catch (error) {
+    const respuesta = {
+      error: true,
+      mensaje: `Algo ocurrio en la base de datos: ${error.message}`,
+    };
+    res.json(respuesta);
+  }
+
+  if (grabacionConUrl.length > 0) {
+    if (grabacionConUrl[0]._id != req.params.id) {
+      const respuesta = {
+        error: true,
+        mensaje: `ya existe una grabación con ese nombre`,
+      };
+      res.json(respuesta);
+
+      return;
+    }
+  }
+
   let tagsDB = JSON.parse(tags);
   let fechaDB = JSON.parse(fecha);
 
@@ -139,6 +308,7 @@ async function editarGrabacion(req, res, next) {
   const audioA = grabacion.audio;
 
   grabacion.titulo = titulo;
+  grabacion.url = urlString;
   grabacion.descripcion = descripcion;
   grabacion.interpretes = interpretes;
   grabacion.fecha = fechaDB;
@@ -173,19 +343,18 @@ async function borrarGrabacion(req, res, next) {
 
   let grabacion;
 
-  try{
+  try {
     grabacion = await Grabacion.findById(id);
 
-    if(!grabacion){
+    if (!grabacion) {
       res.json("La grabación ya no existe en la base de datos");
     }
-
-  }catch(error){
+  } catch (error) {
     console.log(error);
-    res.json("Algo ocurrió al tratar de borrar")
+    res.json("Algo ocurrió al tratar de borrar");
   }
 
-  const audio = grabacion.audio;  
+  const audio = grabacion.audio;
 
   fs.unlink(audio, (err) => {
     if (err) {
@@ -204,6 +373,8 @@ async function borrarGrabacion(req, res, next) {
 
 exports.traerGrabaciones = traerGrabaciones;
 exports.crearGrabacion = crearGrabacion;
+exports.traerGrabacionUrl = traerGrabacionUrl;
+exports.traerGrabacionRandom = traerGrabacionRandom;
 exports.traerGrabacion = traerGrabacion;
 exports.editarGrabacion = editarGrabacion;
 exports.borrarGrabacion = borrarGrabacion;

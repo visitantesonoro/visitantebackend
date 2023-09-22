@@ -5,6 +5,10 @@ const grabacionSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  url: {
+    type: String,
+    required: false,
+  },
   audio:{
     type:String,
     required:true

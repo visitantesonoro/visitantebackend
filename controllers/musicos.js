@@ -161,8 +161,6 @@ async function editarMusico(req, res, next) {
 
   const urlString = crearFriendlyUrl(nombre);
 
-  console.log(urlString)
-
   let musicoConUrl;
 
   try {
