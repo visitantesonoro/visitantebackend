@@ -98,15 +98,27 @@ async function traerGrabacionUrl(req, res, next) {
 
   const grabacion = grabacionR[0];
 
-  const musico = await Musico.findById(grabacion.musico);
+  let musico, categoria, grabacionesCategoria, grabacionesMusico
 
-  const categoria = await Categoria.findById(grabacion.categoria);
-  //const tags = await Tag.findById({});
+  try{  
+    musico = await Musico.findById(grabacion.musico);
 
-  const grabacionesCategoria = await Grabacion.find({
-    categoria: categoria._id,
-  });
-  const grabacionesMusico = await Grabacion.find({ musico: musico.id });
+    categoria = await Categoria.findById(grabacion.categoria);
+    //const tags = await Tag.findById({});
+  
+    grabacionesCategoria = await Grabacion.find({
+      categoria: categoria._id,
+    });
+    grabacionesMusico = await Grabacion.find({ musico: musico.id });
+  }catch(error){
+    console.log(error);
+  }
+
+  if(!musico || !categoria || !grabacionesCategoria || !grabacionesMusico){
+    console.log("pailas");
+    return;
+  }
+  
 
   const info = {
     musico,
@@ -121,10 +133,6 @@ async function traerGrabacionUrl(req, res, next) {
 }
 
 async function traerGrabacionRandom(req, res, next) {
-  const id = req.params.id;
-
-  console.log("llegó");
-
   let grabacion;
 
   try {

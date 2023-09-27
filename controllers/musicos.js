@@ -33,8 +33,6 @@ async function traerMusicoUrl(req, res, next) {
 
     musico = resultado[0];
 
-    console.log(musico);
-
     if (!musico) {
       res.json("no encontramos el músico");
       return;
