@@ -30,6 +30,7 @@ const fileUpload = multer({
       const lastIndex = file.originalname.lastIndexOf(".");
       const fileN = file.originalname.slice(0, lastIndex);
       const name = `${fileN}-${id}.${ext}`;
+     
       cb(null, name);
     },
   }),
@@ -40,7 +41,7 @@ const fileUpload = multer({
   },
 });
 
-router.use(checkAuth);
+//router.use(checkAuth);
 
 router.post(
   "/crear",
