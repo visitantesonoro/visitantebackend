@@ -16,18 +16,6 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
-let whitelist = ['http://127.0.0.1:5500', 'https://alejoforero.com/']
-
-let corsOptions = {
-  origin:function (origin, callback){
-    console.log(whitelist.indexOf(origin));
-    if(whitelist.indexOf(origin) !== -1){
-      callback(null, true)
-    }else{
-      callback(new Error("CORS"))
-    }
-  }
-}
 
 
 app.use(bodyParser.json());
@@ -44,7 +32,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/admin/musicos/", cors(corsOptions), musicosRouter);
+app.use("/admin/musicos/", musicosRouter);
 app.use("/admin/grabaciones/", grabacionesRouter);
 app.use("/admin/categorias/", categoriasRouter);
 app.use("/admin/tags/", tagsRouter);
