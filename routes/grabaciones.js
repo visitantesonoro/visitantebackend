@@ -6,6 +6,7 @@ const { check } = require("express-validator");
 const multer = require("multer");
 const crypto = require("crypto");
 const { checkAuth } = require("../middleware/check-auth");
+const FTPStorage = require("multer-ftp");
 
 router.get("/", grabacionController.traerGrabaciones);
 router.get("/:id", grabacionController.traerGrabacion);
@@ -20,29 +21,59 @@ const MIME_TYPE_MAP = {
 };
 
 const fileUpload = multer({
-  limits: 5000000,
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "./public/uploads/audios");
-    },
-    filename: (req, file, cb) => {
-      const ext = MIME_TYPE_MAP[file.mimetype];
+  limits: 500000,
+  storage: new FTPStorage({
+    destination: function (req, file, options, callback) {
 
+      const ext = MIME_TYPE_MAP[file.mimetype];
       const id = crypto.randomUUID();
       const lastIndex = file.originalname.lastIndexOf(".");
       const fileN = file.originalname.slice(0, lastIndex);
 
-      const name = `${fileN}-${id}.${ext}`;
+      const name = `./visitantesonorouploads/audio/${fileN}-${id}.${ext}`;
 
-      cb(null, name);
+      callback(null, name);
+    },
+    ftp: {
+      host: process.env.ALEJO_HOST,
+      secure: false, // enables FTPS/FTP with TLS
+      user: process.env.ALEJO_USER,
+      password: process.env.ALEJO_PASSWORD
     },
   }),
   fileFilter: (req, file, cb) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
+
     let error = isValid ? null : "invalido";
+
     cb(error, isValid);
   },
-});
+})
+
+// const fileUpload = multer({
+//   limits: 5000000,
+//   storage: multer.diskStorage({
+//     destination: (req, file, cb) => {
+//       cb(null, "./public/uploads/audios");
+//     },
+//     filename: (req, file, cb) => {
+//       const ext = MIME_TYPE_MAP[file.mimetype];
+
+//       const id = crypto.randomUUID();
+//       const lastIndex = file.originalname.lastIndexOf(".");
+//       const fileN = file.originalname.slice(0, lastIndex);
+
+//       const name = `${fileN}-${id}.${ext}`;
+
+//       cb(null, name);
+//     },
+//   }),
+//   fileFilter: (req, file, cb) => {
+//     const isValid = !!MIME_TYPE_MAP[file.mimetype];
+//     let error = isValid ? null : "invalido";
+//     cb(error, isValid);
+//   },
+// });
 
 router.post(
   "/crear",

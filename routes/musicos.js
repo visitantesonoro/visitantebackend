@@ -7,7 +7,7 @@ const multer = require("multer");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { checkAuth } = require("../middleware/check-auth");
-var FTPStorage = require("multer-ftp");
+const FTPStorage = require("multer-ftp");
 
 router.get("/", musicosController.traerMusicos);
 router.get("/:id", musicosController.traerMusico);
@@ -52,7 +52,7 @@ const fileUpload = multer({
       const lastIndex = file.originalname.lastIndexOf(".");
       const fileN = file.originalname.slice(0, lastIndex);
 
-      const name = `./uploads/admin/perfiles/${fileN}-${id}.${ext}`;
+      const name = `./visitantesonorouploads/imgs/perfiles/${fileN}-${id}.${ext}`;
 
       callback(null, name);
     },

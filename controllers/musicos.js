@@ -123,11 +123,11 @@ async function crearMusico(req, res, next) {
     };
     res.json(respuesta);
 
-    fs.unlink(req.file.path, (err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
+    // fs.unlink(req.file.path, (err) => {
+    //   if (err) {
+    //     console.log(err);
+    //   }
+    // });
 
     return;
   }
@@ -211,13 +211,13 @@ async function editarMusico(req, res, next) {
     return;
   }
 
-  if (req.file) {
-    fs.unlink(imgA, (err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
-  }
+  // if (req.file) {
+  //   fs.unlink(imgA, (err) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //   });
+  // }
 
   res.json(musicoDB);
 }
@@ -250,11 +250,15 @@ async function borrarMusico(req, res, next) {
     return;
   }
 
-  fs.unlink(musicoDB.imagen, (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+  const urlImg = "https://alejoforero.com" +  musicoDB.imagen.slice(1);
+
+  console.log(urlImg);
+
+  // fs.unlink(urlImg, (err) => {
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  // });
 
   try {
     await Musico.findByIdAndDelete(req.params.id);

@@ -210,11 +210,11 @@ async function crearGrabacion(req, res, next) {
     };
     res.json(respuesta);
 
-    fs.unlink(req.file.path, (err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
+    // fs.unlink(req.file.path, (err) => {
+    //   if (err) {
+    //     console.log(err);
+    //   }
+    // });
 
     return;
   }
@@ -335,13 +335,13 @@ async function editarGrabacion(req, res, next) {
     return;
   }
 
-  if (req.file) {
-    fs.unlink(audioA, (err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
-  }
+  // if (req.file) {
+  //   fs.unlink(audioA, (err) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //   });
+  // }
 
   res.json(grabacion);
 }
@@ -364,11 +364,11 @@ async function borrarGrabacion(req, res, next) {
 
   const audio = grabacion.audio;
 
-  fs.unlink(audio, (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+  // fs.unlink(audio, (err) => {
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  // });
 
   try {
     await Grabacion.findByIdAndDelete(id);
