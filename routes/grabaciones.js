@@ -21,7 +21,7 @@ const MIME_TYPE_MAP = {
 };
 
 const fileUpload = multer({
-  limits: 500000,
+  limits: 50000000,
   storage: new FTPStorage({
     destination: function (req, file, options, callback) {
 

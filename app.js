@@ -15,8 +15,8 @@ const path = require("path");
 const app = express();
 
 app.use(bodyParser.json());
-app.use("/public", express.static(path.join(__dirname, "./public/")));
-app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+// app.use("/public", express.static(path.join(__dirname, "./public/")));
+// app.use('/uploads/images', express.static(path.join('uploads', 'images')));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
