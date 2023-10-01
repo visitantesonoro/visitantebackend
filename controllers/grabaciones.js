@@ -23,6 +23,23 @@ async function traerGrabaciones(req, res, next) {
   res.json(info);
 }
 
+async function traerUltimasGrabaciones(req, res, next) {
+  const grabaciones = await Grabacion.find().sort({ _id: -1 }).limit(8);
+
+  const musicos = await Musico.find({});
+  const categorias = await Categoria.find({});
+  const tags = await Tag.find({});
+
+  const info = {
+    musicos,
+    grabaciones,
+    categorias,
+    tags,
+  };
+
+  res.json(info);
+}
+
 async function traerGrabacion(req, res, next) {
   const id = req.params.id;
 
@@ -380,6 +397,7 @@ async function borrarGrabacion(req, res, next) {
 }
 
 exports.traerGrabaciones = traerGrabaciones;
+exports.traerUltimasGrabaciones = traerUltimasGrabaciones;
 exports.crearGrabacion = crearGrabacion;
 exports.traerGrabacionUrl = traerGrabacionUrl;
 exports.traerGrabacionRandom = traerGrabacionRandom;

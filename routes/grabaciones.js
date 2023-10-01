@@ -8,6 +8,7 @@ const crypto = require("crypto");
 const { checkAuth } = require("../middleware/check-auth");
 const FTPStorage = require("multer-ftp");
 
+router.get("/ultimas/", grabacionController.traerUltimasGrabaciones);
 router.get("/", grabacionController.traerGrabaciones);
 router.get("/:id", grabacionController.traerGrabacion);
 router.get("/url/:url", grabacionController.traerGrabacionUrl);
